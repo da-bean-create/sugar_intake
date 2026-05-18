@@ -1,4 +1,4 @@
-def main_menu()
+def main_menu():
   while true:
     print("------Data Menu------")
     print("1. View Raw Dataset")
@@ -9,3 +9,4 @@ def main_menu()
     user_choice = input("Select an Option")
     if user_choice == "2":
         print("ok")
+print(main_menu())
