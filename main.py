@@ -1,3 +1,7 @@
+from data_module import(
+  raw_data
+)
+
 def main_menu():
   while true:
     print("------Data Menu------")
@@ -7,7 +11,7 @@ def main_menu():
     print("4. Update Data Entry")
     
     user_choice = input("Select an Option")
-    if user_choice == "2":
-        print("ok")
+    if user_choice == "1":
+        raw_data()
 
 print(main_menu())
