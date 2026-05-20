@@ -46,5 +46,35 @@ raw_data = pd.DataFrame([
                         [43, "5-6", "50g+", "chocolate, lollies, gum", "No Change", "bad", "diet", "Australian"],
                         [44, "3-4", "20-29g", "cookies, brownies, cakes, ice cream, cookies", "Small Increase", "bad", "diet", "Middle Eastern"],
                         [45, "3-4", "30-39g", "soft drink, lollies, biscuits", "Small Decrease", "bad", "awareness", "European"]
-                        ])
+                        ],
+                        columns = ["ID", "No Of Sugary Snacks Per Day", "Daily Sugar Consumption", "Commonly Eaten Treats", "Sugar Consumption Compared to Last Year", "Thoughts on OBESITY", "OBESITY Prevention Methods", "Ethnicity"]
+                        )
 print(raw_data())
+
+def search_data():
+    filtered_df = df.copy()
+
+    while True:
+        print("\nAvailable columns:")
+        print(df.columns.tolist())
+
+        column = input("Enter column to search: ")
+
+        if column not in df.columns:
+            print("Invalid column name.")
+            continue
+
+        value = input("Enter value to search in '{column}':")
+        filtered_df = filtered_df[
+            filtered_df[column]
+            .astype(str)
+            .str.contains(value, case=False, na=False)
+        ]
+
+        again = input("Add another filter? (yes/no): ").lower()
+
+        if again != "yes":
+            break
+
+    print("Filtered Results:")
+    print(filtered_df)
