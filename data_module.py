@@ -49,32 +49,88 @@ raw_data = pd.DataFrame([
                         ],
                         columns = ["ID", "No Of Sugary Snacks Per Day", "Daily Sugar Consumption", "Commonly Eaten Treats", "Sugar Consumption Compared to Last Year", "Thoughts on OBESITY", "OBESITY Prevention Methods", "Ethnicity"]
                         )
-print(raw_data())
 
-def search_data():
+def search_data(df=raw_data):
     filtered_df = df.copy()
+    columns_map = {col.lower(): col for col in df.columns}
 
     while True:
-        print("\nAvailable columns:")
+        print("Available columns:")
         print(df.columns.tolist())
 
-        column = input("Enter column to search: ")
-
-        if column not in df.columns:
+        column_input = input("Enter column to search: ").strip().lower()
+        if column_input not in columns_map:
             print("Invalid column name.")
             continue
 
-        value = input("Enter value to search in '{column}':")
+        column = columns_map[column_input]
+        value = input(f"Enter value to search in '{column}': ").strip()
+
         filtered_df = filtered_df[
             filtered_df[column]
             .astype(str)
             .str.contains(value, case=False, na=False)
         ]
 
-        again = input("Add another filter? (yes/no): ").lower()
+        again = input("Add another filter? (yes/no): ").strip().lower()
 
         if again != "yes":
             break
 
     print("Filtered Results:")
     print(filtered_df)
+
+def add_data_entry():
+    global raw_data
+
+    print("=== Add New Data Entry ===")
+
+    new_entry = {}
+
+    for column in raw_data.columns:
+        if column == "ID":
+            new_entry[column] = len(raw_data) + 1
+            continue
+
+        value = input(f"Enter value for '{column}': ").strip()
+        new_entry[column] = value
+
+    print("New Entry Preview:")
+    print(new_entry)
+    return new_entry
+
+def save_data_entry(new_entry):
+    save_answer = input("Would you like to save this entry? (yes/no): ").strip().lower()
+    if save_answer == "yes":
+        raw_data.loc[len(raw_data)] = [new_entry[col] for col in raw_data.columns]
+        print("Entry saved successfully.")
+    else:
+        print("Entry discarded.")
+
+def delete_data():
+    global raw_data
+
+    print("=== Delete Data Entry ===")
+
+    delete_id = input("Enter the ID of the entry to delete: ")
+
+    matching_rows = raw_data[raw_data["ID"].astype(str) == delete_id]
+
+    if matching_rows.empty:
+        print("No entry found with that ID.")
+        return
+    print("Entry Found:")
+    print(matching_rows)
+
+    confirm = input("Are you sure you want to delete this entry? (yes/no): ").lower()
+
+    if confirm == "yes":
+        raw_data = raw_data[raw_data["ID"].astype(str) != delete_id]
+
+        # Reset dataframe index
+        raw_data.reset_index(drop=True, inplace=True)
+
+        print("Entry deleted successfully.")
+
+    else:
+        print("Deletion cancelled.")
