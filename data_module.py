@@ -1,4 +1,11 @@
+import os
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_colwidth', None)
 
 raw_data = pd.DataFrame([
                         [1, "2", "", "ice cream", "Moderate Decrease", "censored", "ban obesity", ""],
@@ -50,13 +57,14 @@ raw_data = pd.DataFrame([
                         columns = ["ID", "No Of Sugary Snacks Per Day", "Daily Sugar Consumption", "Commonly Eaten Treats", "Sugar Consumption Compared to Last Year", "Thoughts on OBESITY", "OBESITY Prevention Methods", "Ethnicity"]
                         )
 
-def search_data(df=raw_data):
-    filtered_df = df.copy()
-    columns_map = {col.lower(): col for col in df.columns}
+
+def search_data(raw_data):
+    filtered_df = raw_data.copy()
+    columns_map = {col.lower(): col for col in raw_data.columns}
 
     while True:
         print("Available columns:")
-        print(df.columns.tolist())
+        print(raw_data.columns.tolist())
 
         column_input = input("Enter column to search: ").strip().lower()
         if column_input not in columns_map:
@@ -79,6 +87,12 @@ def search_data(df=raw_data):
 
     print("Filtered Results:")
     print(filtered_df)
+
+
+def show_full_dataset(dataframe):
+    print("Full Dataset:")
+    print(dataframe.to_string(index=False))
+
 
 def add_data_entry():
     global raw_data
@@ -134,3 +148,64 @@ def delete_data():
 
     else:
         print("Deletion cancelled.")
+
+
+def _display_or_save_plot(filename):
+    try:
+        plt.tight_layout()
+        plt.savefig(filename, dpi=150)
+        path = os.path.abspath(filename)
+        print(f"Saved plot to: {path}")
+        print("Open this file in VS Code or your file manager to view the image.")
+    except Exception as e:
+        print(f"Failed to save plot: {e}")
+    finally:
+        plt.close()
+
+
+def dataset_representation(raw_data):
+    while True:
+        print("=== Dataset Representation ===")
+        print("1. View Summary Statistics")
+        print("2. View Data Distribution")
+        print("3. Return to Main Menu")
+
+        choice = input("Select an option: ")
+
+        if choice == "1":
+            print(raw_data.describe(include='all'))
+        elif choice == "2":
+            raw_data['No Of Sugary Snacks Per Day'].value_counts().plot(kind='bar')
+            plt.title('Distribution of No Of Sugary Snacks Per Day')
+            plt.xlabel('No Of Sugary Snacks Per Day')
+            plt.ylabel('Frequency')
+            _display_or_save_plot('dataset_distribution.png')
+        else:
+            print("Returning to Main Menu...")
+
+
+def view_visualisation():
+
+    ethnicity_counts = raw_data["Ethnicity"].value_counts()
+
+    plt.bar(
+        ethnicity_counts.index,
+        ethnicity_counts.values
+    )
+
+    plt.title("Ethnicity Counts")
+    plt.xlabel("Ethnicity")
+    plt.ylabel("Count")
+
+    _display_or_save_plot('visualisation1.png')
+
+def view_visualisation2():
+
+    pivot = raw_data.groupby(["Daily Sugar Consumption", "Thoughts on OBESITY"]).size().unstack(fill_value=0)
+    pivot.plot(kind='bar', stacked=True)
+
+    plt.title("Daily Sugar Consumption vs Thoughts on OBESITY")
+    plt.xlabel("Daily Sugar Consumption")
+    plt.ylabel("Number of Responses")
+
+    _display_or_save_plot('visualisation2.png')
